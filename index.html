@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>LLMs for Machine Translation are here but not quite yet</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/beige.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h2>LLMs for Machine Translation are here</h2>
+				<img src="img/intro.png" height="400px" style="margin: 0px;">
+				<h2 style="margin: 0px;">But not quite yet</h2>
+				<br>
+				<small>DHSE Consumer DS Chapter | 2025 | Roman Grebennikov</small>
+			</section>
+			<section>
+				<h2>Agenda</h2>
+				<ul>
+					<li>Seq2Seq translation and Google Translate</li>
+					<li>How to measure MT quality?</li>
+					<li>LLMs for MT</li>
+					<li>Open-source and DIY MT</li>
+				</ul>
+				<img src="img/history.png" height="400px" style="margin: 0px;">
+			</section>
+			<section>
+				<h2>A long time ago in a galaxy far, far away</h2>
+				<p>There was a SMT - Statistical Machine Translation</p>
+				<img src="img/smt.png">
+				<p>Google Translate prior to 2016 (hint - it was really bad)</p>
+			</section>
+			<section>
+				<h2>SMT idea</h2>
+				<ul>
+					<li>Learn rules from parallel corpus</li>
+					<li>Augment with grammar rules</li>
+					<li>...</li>
+					<li>PROFIT</li>
+				</ul>
+				<p><img src="img/smt-example.png" height="300px"></p>
+			</section>
+			<section>
+				<h2>What was wrong with SMT?</h2>
+				<p>TLDR: it was horrible</p>
+				<ul>
+					<li>Grammar is not always transferrable: </li>
+					<li>Need for parallel texts: de➜ru was in fact de➜en➜ru</li>
+					<li>Hard to fix errors</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Rise of Transformers</h2>
+				<img src="img/transformers.png" height="350px">
+				<ul>
+					<li>Internal interlingua representation: no hopping via en</li>
+					<li>No explicit rules to define</li>
+					<li>Errors: just add them to the training data</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Google Translate</h2>
+				<img src="img/gt.png">
+			</section>
+			<section>
+				<h2>LLM as a translator</h2>
+				<p><img src="img/chatgpt.png"></p>
+				<ul>
+					<li>No need for special MT models</li>
+					<li>No need for parallel corpora</li>
+				</ul>
+			</section>
+			<section>
+				<img src="img/why.png">
+			</section>
+			<section>
+				<h2>Traditional MT Metrics</h2>
+				<p>How to judge translation quality?</p>
+				<ul>
+					<li>Word-based: BLEU, WER, TER, ROUGE</li>
+					<li>Character-based: chrF, chrF++</li>
+				</ul>
+				<img src="img/wer.jpg">
+			</section>
+			<section>
+				<img src="img/bleu.jpg" height="500px">
+				<p>Wait, does this match human preferences?</p>
+			</section>
+			<section>
+				<h2>Parallel eval datasets: WMT</h2>
+				<img src="img/wmt.png" height="450px" style="margin: 0px;">
+				<ul>
+					<li>Human-translated parallel sets, professional level</li>
+					<li>Only 5-10 language pairs per year</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Parallel eval datasets: FLORES+</h2>
+				<img src="img/flores.png" height="450px" style="margin: 0px;">
+				<ul>
+					<li>Same 2000 sentences from EN wiki</li>
+					<li>Professionally translated to 200 languages</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Issue with word-char metrics</h2>
+				<img src="img/boromir.png" height="200px">
+				<p>There is a context! And char/word metrics miss it!</p>
+			</section>
+			<section>
+				<img src="img/been.png">
+				<ul>
+					<li><strong>Input</strong>: [source, reference, translation]</li>
+					<li><strong>Output</strong>: [0..1 score]</li>
+				</ul>
+			</section>
+			<section>
+				<h2>COMET & XCOMET</h2>
+				<img src="img/comet.png" height="450px">
+				<p>Train on human preferences: WMT & FLORES</p>
+			</section>
+			<section>
+				<img src="img/comet-table.png" style="margin: 0px;">
+				<img src="img/xcomet-table.webp" style="margin: 0px;">
+			</section>
+			<section>
+				<h2>OK lets benchmark</h2>
+				<img src="img/research.jpg" height="400px" style="margin: 0px;">
+				<ul>
+					<li>Metric: XCOMET and BLEU/chrF++ scores</li>
+					<li>Data: FLORES+, en -> es/tr/ar/cn/ru</li>
+					<li>Models: GPT4, open-source MT and LLMs, Google Translate</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Results</h2>
+				<img src="img/llm1.png" height="300px">
+				<ul>
+					<li>GPT4-o has higher chrF++ than GT, is it a leak?</li>
+					<li>Closed LLMs have MUCH higher MT metrics</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Does size matter?</h2>
+				<img src="img/size.png" height="230px">
+				<ul>
+					<li>TLDR: yes!</li>
+					<li>Hi-Resource Langs: small degradation</li>
+					<li>Low-Resource Langs: high degradation</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Does prompt affect quality?</h2>
+				<pre><code>
+Translate the following text from English to $language. 
+Write only the translation text.
+$source
+				</code></pre>
+				<pre><code>
+I will give you 200$ if you correctly translate the following text 
+from English to $language. Write only the translation text. 
+$source
+				</code></pre>
+				<pre><code>
+You`re an expert translator in $language that will be tasked with 
+translating a piece of text. Ensure that the meaning of the original 
+text is not changed. Please respond only in $language language. 
+Do not explain what you're doing. Write only the translation text. 
+Translate the following text from English to $language: 
+$source
+				</code></pre>
+			</section>
+			<section>
+				<h2>Prompt types</h2>
+				<img src="img/prompt.png" height="250px">
+				<ul>
+					<li>TLDR: do not mess with the prompt</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Quantization</h2>
+				<p>TLDR: int4, int8, bf16 - is there a difference?</p>
+				<img src="img/quant.png" height="250px">
+				<ul>
+					<li>small models - huge impact</li>
+					<li><s>don't be poor</s> Prefer bf16 if you can</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Open-source NMT models</h2>
+				<ul>
+					<li>Google: MADLAD</li>
+					<li>Facebook: NLLB (No Language Left Behind)</li>
+					<li>Academy: ALMA, X-ALMA</li>
+				</ul>
+			</section>
+			<section>
+				<h2>NLLB+MADLAD</h2>
+				<img src="img/nllb.png" height="400px" style="margin: 0px;">
+				<ul>
+					<li>Transformer models, 10B-40B size</li>
+					<li>Trained on semi-synthetic parallel texts</li>
+					<li>TLDR: "open-source google translate like models"</li>
+				</ul>
+			</section>
+			<section>
+				<h2>X-ALMA</h2>
+				<img src="img/alma.png" height="400px" style="margin: 0px;">
+				<ul>
+					<li>Curse of multi-linguality: 10 LORA adapters</li>
+					<li>Only high-quality data for training</li>
+					<li>Llama2 fine-tune with extended vocab</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Open-source results</h2>
+				<img src="img/llm2.png" height="370px">
+				<ul>
+					<li>NMT models (NLLB+MADLAD): way below GT</li>
+					<li>X-ALMA (llama2 based!) SOTA?</li>
+				</ul>
+			</section>
+			<section>
+				<h2>DIY MT MODEL</h2>
+				<p>Idea: take gemma 2/3 and ALMA data</p>
+				<ul>
+					<li>Much stronger backbone (than llama2)</li>
+					<li>Tiny dataset, only single language</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Axolotl trainer</h2>
+				<p>Too lazy to write training code? Axolotl!</p>
+				<img src="img/axolotl.png">
+			</section>
+			<section>
+				<h2>DIY results</h2>
+				<p><img src="img/diy.png" height="350px"></p>
+				<ul>
+					<li>yay +1% quality to Gemma2-27B</li>
+					<li>Same results as X-ALMA in 2h of work</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Final words</h2>
+				<ul>
+					<li>Bigger LLM is always better</li>
+					<li>There's a ton of metrics for MT</li>
+					<li>Gemma3 - ❤️</li>
+				</ul>
+			</section>
+			<section>
+				<h1>questions?</h1>
+				<!--p><img src="img/qr.png" style="margin: 0px;"></p>
+				<small>[link to slides]</small-->
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			history: true,
+			controls: true,
+			progress: true,
+			width: 1200,
+			transition: 'none',
+			slideNumber: true,
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
